@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Source Serif Pro Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Source Serif Pro Regular'), url('https://cdn.shopify.com/s/files/1/0621/2786/5965/files/SourceSerifPro-Regular.woff?v=1742560939') format('woff');
+}
+
+
+@font-face {
+  font-family: 'Source Serif Pro ExtraLight';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Source Serif Pro ExtraLight'), url('https://cdn.shopify.com/s/files/1/0621/2786/5965/files/SourceSerifPro-ExtraLight.woff?v=1742560939') format('woff');
+}
+
+
+@font-face {
+  font-family: 'Source Serif Pro Light';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Source Serif Pro Light'), url('https://cdn.shopify.com/s/files/1/0621/2786/5965/files/SourceSerifPro-Light.woff?v=1742560939') format('woff');
+}
+
+
+@font-face {
+  font-family: 'Source Serif Pro SemiBold';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Source Serif Pro SemiBold'), url('https://cdn.shopify.com/s/files/1/0621/2786/5965/files/SourceSerifPro-SemiBold.woff?v=1742560939') format('woff');
+}
+
+
+@font-face {
+  font-family: 'Source Serif Pro Bold';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Source Serif Pro Bold'), url('https://cdn.shopify.com/s/files/1/0621/2786/5965/files/SourceSerifPro-Bold.woff?v=1742560939') format('woff');
+}
+
+
+@font-face {
+  font-family: 'Source Serif Pro Black';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Source Serif Pro Black'), url('https://cdn.shopify.com/s/files/1/0621/2786/5965/files/SourceSerifPro-Black.woff?v=1742560939') format('woff');
+}

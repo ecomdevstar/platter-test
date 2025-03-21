@@ -1,0 +1,177 @@
+.es-featured-collection {
+  .collection {
+    .collection__title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      
+      .button {
+        margin: 0;
+        font-family: Poppins;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 140%;
+        letter-spacing: 1px;
+        text-align: center;
+        background: #FFF;
+        gap: 10px;
+
+        &::before,
+        &::after {
+          content: unset;
+        }
+      }
+
+      h2.title {
+        font-family: "Source Serif Pro Bold", sans-serif;
+        font-weight: 900;
+        font-size: 40px;
+        line-height: 120%;
+        letter-spacing: -1px;
+        margin: 0;
+
+        @media (max-width: 768px) {
+          font-size: 28px;
+          text-align: center;
+        }
+      }
+
+      @media (max-width: 768px) {
+        justify-content: center;
+      }
+    }
+
+    .card-wrapper {
+      .card__heading {
+        .full-unstyled-link {
+          font-family: 'Bebas Neue', sans-serif;
+          font-weight: 400;
+          font-size: 18px;
+          line-height: 100%;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          color: #1C1D1D;
+          text-decoration: none;
+
+          @media (max-width: 768px) {
+            font-size: 16px;
+          }
+        }
+      }
+
+      .jdgm-star {
+        font-size: 12px;
+      }
+
+      .jdgm-prev-badge__text {
+        font-family: Poppins;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 100%;
+        letter-spacing: 0%;
+        color: #707070;
+      }
+
+      .card-information {
+        .price {
+          .price__container {
+            font-family: Poppins;
+            font-weight: 500;
+            font-size: 16px;
+            line-height: 100%;
+            text-transform: uppercase;
+            color: #1C1D1D;
+          }
+        }
+      }
+
+      .card__badge {
+        width: 100%;
+        display: flex;
+
+        .badge {
+          font-family: 'Bebas Neue', sans-serif;
+          font-weight: 400;
+          font-size: 10px;
+          line-height: 100%;
+          letter-spacing: 6%;
+          text-align: center;
+          display: block;
+          padding: 4px 8px;
+          border: 1px solid #000;
+          max-width: max-content;
+
+          &.sale-badge {
+            background-color: #5C7962;
+            margin-left: auto;
+            color: #FFF;
+          }
+
+          &.best-badge {
+            background-color: white;
+            color: #000000;
+          }
+        }
+      }
+    }
+  }
+
+  .slider-buttons {
+    width: 100%;
+
+    .slider-button {
+      display: none;
+    }
+
+    .slider-counter {
+      width: 100%;
+
+      .slideshow__control-wrapper {
+        width: 100%;
+        background-color: #DDD6D7;
+
+        .slider-counter__link {
+          width: 100%;
+          display: block;
+          overflow: hidden;
+          padding: 0;
+
+          span {
+            border: 0;
+            border-radius: 0;
+            width: 100%;
+            display: block;
+            height: 3px;
+            transition: 0;
+          }
+
+          &.slider-counter__link--active,
+          &:hover {
+            border-radius: 30px;
+            outline: 1px solid #231F20;
+
+            span {
+              background-color: #231F20;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .es-show-more {
+    width: 100%;
+    text-align: center;
+    font-family: Poppins;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 140%;
+    border-radius: 50px;
+
+    &::before,
+    &::after {
+      border-radius: 50px;
+    }
+  }
+}

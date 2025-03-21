@@ -68,7 +68,7 @@
   >
     <div class="collection__title title-wrapper title-wrapper--no-top-margin page-width{% if show_mobile_slider %} title-wrapper--self-padded-tablet-down{% endif %}{% if show_desktop_slider %} collection__title--desktop-slider{% endif %}">
       {%- if section.settings.title != blank -%}
-        <h2 class="title inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        <h2 class="title !text-[#231F20] inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
           {{ section.settings.title }}
         </h2>
       {%- endif -%}
@@ -82,6 +82,18 @@
           {%- else -%}
             {{ section.settings.description -}}
           {%- endif %}
+        </div>
+      {%- endif -%}
+      {%- if section.settings.show_view_all and more_in_collection -%}
+        <div class="center collection__view-all{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %} small-hide">
+          <a
+            href="{{ section.settings.collection.url }}"
+            class="{% if section.settings.view_all_style == 'link' %}link underlined-link{% elsif section.settings.view_all_style == 'solid' %}button{% else %}button button--secondary{% endif %} !text-[#5C553A]"
+            aria-label="{{ 'sections.featured_collection.view_all_label' | t: collection_name: section.settings.collection.title | escape }}"
+          >
+            Shop All {{ section.settings.collection.title }}
+            <img src="https://cdn.shopify.com/s/files/1/0621/2786/5965/files/arrow-narrow-right.svg?v=1742566694">
+          </a>
         </div>
       {%- endif -%}
     </div>
@@ -101,7 +113,7 @@
             {%- for product in section.settings.collection.products limit: section.settings.products_to_show -%}
               <li
                 id="Slide-{{ section.id }}-{{ forloop.index }}"
-                class="grid__item{% if show_mobile_slider or show_desktop_slider %} slider__slide{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+                class="grid__item{% if show_mobile_slider or show_desktop_slider %} slider__slide{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}{% if forloop.index > 4 %} small-hide{% endif %}"
                 {% if settings.animations_reveal_on_scroll %}
                   data-cascade
                   style="--animation-order: {{ forloop.index }};"
@@ -152,7 +164,7 @@
         {%- endif -%}
       </ul>
       {%- if show_mobile_slider or show_desktop_slider -%}
-        <div class="slider-buttons">
+        <div class="slider-buttons page-width">
           <button
             type="button"
             class="slider-button slider-button--prev"
@@ -165,10 +177,14 @@
             </span>
           </button>
           <div class="slider-counter caption">
-            <span class="slider-counter--current">1</span>
-            <span aria-hidden="true"> / </span>
-            <span class="visually-hidden">{{ 'general.slider.of' | t }}</span>
-            <span class="slider-counter--total">{{ products_to_display }}</span>
+            <div class="slideshow__control-wrapper">
+              {%- assign new_offset = section.settings.columns_desktop | plus: 1 -%}
+              {%- for product in section.settings.collection.products limit: section.settings.products_to_show offset: new_offset -%}
+                <button class="slider-counter__link slider-counter__link--dots link" aria-label="Load {{ forloop.index }} of {{ forloop.length }}" aria-controls="Slider-{{ section.id }}">
+                  <span class="dot"></span>
+                </button>
+              {%- endfor -%}
+            </div>
           </div>
           <button
             type="button"
@@ -183,9 +199,15 @@
           </button>
         </div>
       {%- endif -%}
+
+      <div class="page-width medium-hide large-up-hide">
+        <a href="javascript:void(0)" class="button es-show-more">
+          Show More
+        </a>
+      </div>
     </slider-component>
 
-    {%- if section.settings.show_view_all and more_in_collection -%}
+    {% comment %} {%- if section.settings.show_view_all and more_in_collection -%}
       <div class="center collection__view-all{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
         <a
           href="{{ section.settings.collection.url }}"
@@ -198,15 +220,30 @@
     {%- endif -%}
     {% if section.settings.image_shape == 'arch' %}
       {{ 'mask-arch.svg' | inline_asset_content }}
-    {%- endif -%}
+    {%- endif -%} {% endcomment %}
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const showMoreButton = document.querySelector('#shopify-section-{{ section.id }} .es-show-more');
+    const sliders = document.querySelectorAll('#shopify-section-{{ section.id }} slider-component .grid__item');
+
+    showMoreButton.addEventListener('click', function() {
+      sliders?.forEach(slider => {
+        slider.classList.remove('small-hide');
+      });
+
+      showMoreButton.style.display = 'none';
+    });
+  });
+</script>
 
 {% schema %}
 {
   "name": "t:sections.featured-collection.name",
   "tag": "section",
-  "class": "section",
+  "class": "section es-featured-collection",
   "disabled_on": {
     "groups": ["header", "footer"]
   },

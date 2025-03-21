@@ -125,6 +125,14 @@
             </h3>
           </div>
           <div class="card__badge {{ settings.badge_position }}">
+            {%- if card_product.tags contains 'best' %}
+              <span
+                id="NoMediaStandardBadge-{{ section_id }}-{{ card_product.id }}"
+                class="badge best-badge badge--bottom-left color-{{ settings.sale_badge_color_scheme }}"
+              >
+                Best Seller
+              </span>
+            {%- endif -%}
             {%- if card_product.available == false -%}
               <span
                 id="NoMediaStandardBadge-{{ section_id }}-{{ card_product.id }}"
@@ -135,9 +143,9 @@
             {%- elsif card_product.compare_at_price > card_product.price and card_product.available -%}
               <span
                 id="NoMediaStandardBadge-{{ section_id }}-{{ card_product.id }}"
-                class="badge badge--bottom-left color-{{ settings.sale_badge_color_scheme }}"
+                class="badge sale-badge badge--bottom-left color-{{ settings.sale_badge_color_scheme }}"
               >
-                {{- 'products.product.on_sale' | t -}}
+                Save {{ card_product.compare_at_price | minus: card_product.price | divided_by: 1.0 | divided_by: card_product.compare_at_price | times: 100 | remove: '.0' }}%
               </span>
             {%- endif -%}
           </div>
@@ -154,7 +162,7 @@
             <a
               href="{{ card_product.url }}"
               id="CardLink-{{ section_id }}-{{ card_product.id }}"
-              class="full-unstyled-link"
+              class="full-unstyled-link text-[#5C553A]"
               aria-labelledby="CardLink-{{ section_id }}-{{ card_product.id }} Badge-{{ section_id }}-{{ card_product.id }}"
             >
               {{ card_product.title | escape }}
@@ -167,6 +175,12 @@
             {%- endif -%}
 
             <span class="caption-large light">{{ block.settings.description | escape }}</span>
+
+            <!-- Start of Judge.me code --> 
+              <div class='jdgm-widget jdgm-preview-badge' data-id='{{ card_product.id }}'> 
+                {{ card_product.metafields.judgeme.badge }} 
+              </div> 
+            <!-- End of Judge.me code -->
 
             {%- if show_rating and card_product.metafields.reviews.rating.value != blank -%}
               {% liquid

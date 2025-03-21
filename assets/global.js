@@ -736,24 +736,85 @@ class SliderComponent extends HTMLElement {
     this.prevButton = this.querySelector('button[name="previous"]');
     this.nextButton = this.querySelector('button[name="next"]');
 
+    this.isDragging = false;
+    this.startX = 0;
+    this.scrollStartX = 0;
+    this.dragThreshold = 10;
+    this.isLinkClickAllowed = true;
+
+    this.addEventListener('mousedown', (e) => this.startDrag(e));
+    this.addEventListener('mouseup', (e) => this.stopDrag(e));
+    this.addEventListener('mouseleave', (e) => this.stopDrag(e));
+    this.addEventListener('mousemove', (e) => this.onDrag(e));
+    this.addEventListener('click', (e) => this.onClick(e), true);  
+
     if (!this.slider || !this.nextButton) return;
 
     this.initPages();
-    const resizeObserver = new ResizeObserver((entries) => this.initPages());
+    const resizeObserver = new ResizeObserver(entries => this.initPages());
     resizeObserver.observe(this.slider);
 
     this.slider.addEventListener('scroll', this.update.bind(this));
     this.prevButton.addEventListener('click', this.onButtonClick.bind(this));
     this.nextButton.addEventListener('click', this.onButtonClick.bind(this));
+    this.sliderControlLinksArray = Array.from(this.querySelectorAll('.slider-counter__link'));
+    this.sliderControlLinksArray.forEach(link => link.addEventListener('click', this.linkToSlide.bind(this)));
+  }
+
+  /**
+   * Handles the start of a drag event.
+   * @param {MouseEvent} e
+   */
+  startDrag(e) {
+    e.preventDefault();
+    this.isDragging = true;
+    this.startX = e.pageX;
+    this.scrollStartX = this.slider.scrollLeft;
+    this.isLinkClickAllowed = true;
+  }
+
+  /**
+   * Handles the drag event.
+   * @param {MouseEvent} e
+   */
+  onDrag(e) {
+    if (!this.isDragging) return;
+    e.preventDefault();
+    const currentX = e.pageX;
+    const dx = currentX - this.startX;
+
+    // If we've dragged past a certain threshold, don't allow the click.
+    if (Math.abs(dx) > this.dragThreshold) {
+      this.isLinkClickAllowed = false;
+    }
+
+    this.slider.scrollLeft = this.scrollStartX - dx;
+  }
+  /**
+   * Resets the isDragging state.
+   * @param {MouseEvent} e
+   */
+  stopDrag(e) {
+    this.isDragging = false;
+  }
+  /**
+   * Prevents the click event from firing if the interaction was a drag.
+   * @param {MouseEvent} e
+   */
+  onClick(e) {
+
+    if (!this.isLinkClickAllowed) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.isLinkClickAllowed = true;
+    }
   }
 
   initPages() {
-    this.sliderItemsToShow = Array.from(this.sliderItems).filter((element) => element.clientWidth > 0);
+    this.sliderItemsToShow = Array.from(this.sliderItems).filter(element => element.clientWidth > 0);
     if (this.sliderItemsToShow.length < 2) return;
     this.sliderItemOffset = this.sliderItemsToShow[1].offsetLeft - this.sliderItemsToShow[0].offsetLeft;
-    this.slidesPerPage = Math.floor(
-      (this.slider.clientWidth - this.sliderItemsToShow[0].offsetLeft) / this.sliderItemOffset
-    );
+    this.slidesPerPage = Math.floor((this.slider.clientWidth - this.sliderItemsToShow[0].offsetLeft) / this.sliderItemOffset);
     this.totalPages = this.sliderItemsToShow.length - this.slidesPerPage + 1;
     this.update();
   }
@@ -764,10 +825,7 @@ class SliderComponent extends HTMLElement {
   }
 
   update() {
-    // Temporarily prevents unneeded updates resulting from variant changes
-    // This should be refactored as part of https://github.com/Shopify/dawn/issues/2057
-    if (!this.slider || !this.nextButton) return;
-
+    
     const previousPage = this.currentPage;
     this.currentPage = Math.round(this.slider.scrollLeft / this.sliderItemOffset) + 1;
 
@@ -777,14 +835,10 @@ class SliderComponent extends HTMLElement {
     }
 
     if (this.currentPage != previousPage) {
-      this.dispatchEvent(
-        new CustomEvent('slideChanged', {
-          detail: {
-            currentPage: this.currentPage,
-            currentElement: this.sliderItemsToShow[this.currentPage - 1],
-          },
-        })
-      );
+      this.dispatchEvent(new CustomEvent('slideChanged', { detail: {
+        currentPage: this.currentPage,
+        currentElement: this.sliderItemsToShow[this.currentPage - 1]
+      }}));
     }
 
     if (this.enableSliderLooping) return;
@@ -800,26 +854,36 @@ class SliderComponent extends HTMLElement {
     } else {
       this.nextButton.removeAttribute('disabled');
     }
+    this.sliderControlButtons = this.querySelectorAll('.slider-counter__link');
+
+    if (!this.sliderControlButtons.length) return;
+
+    this.sliderControlButtons.forEach(link => {
+      link.classList.remove('slider-counter__link--active');
+      link.removeAttribute('aria-current');
+    });
+    this.sliderControlButtons[this.currentPage - 1].classList.add('slider-counter__link--active');
+    this.sliderControlButtons[this.currentPage - 1].setAttribute('aria-current', true);
   }
 
   isSlideVisible(element, offset = 0) {
     const lastVisibleSlide = this.slider.clientWidth + this.slider.scrollLeft - offset;
-    return element.offsetLeft + element.clientWidth <= lastVisibleSlide && element.offsetLeft >= this.slider.scrollLeft;
+    return (element.offsetLeft + element.clientWidth) <= lastVisibleSlide && element.offsetLeft >= this.slider.scrollLeft;
   }
 
   onButtonClick(event) {
     event.preventDefault();
     const step = event.currentTarget.dataset.step || 1;
-    this.slideScrollPosition =
-      event.currentTarget.name === 'next'
-        ? this.slider.scrollLeft + step * this.sliderItemOffset
-        : this.slider.scrollLeft - step * this.sliderItemOffset;
-    this.setSlidePosition(this.slideScrollPosition);
-  }
-
-  setSlidePosition(position) {
+    this.slideScrollPosition = event.currentTarget.name === 'next' ? this.slider.scrollLeft + (step * this.sliderItemOffset) : this.slider.scrollLeft - (step * this.sliderItemOffset);
     this.slider.scrollTo({
-      left: position,
+      left: this.slideScrollPosition
+    });
+  }
+  linkToSlide(event) {
+    event.preventDefault();
+    const slideScrollPosition = this.slider.scrollLeft + this.sliderItemOffset * (this.sliderControlLinksArray.indexOf(event.currentTarget) + 1 - this.currentPage);
+    this.slider.scrollTo({
+      left: slideScrollPosition
     });
   }
 }
